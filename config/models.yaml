@@ -1,0 +1,41 @@
+# Model Configuration
+model:
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  llm_model: "microsoft/DialoGPT-medium"
+  cache_dir: "./models"
+  max_context_tokens: 2000
+  batch_size: 32
+
+# Qdrant Vector Database Configuration
+qdrant:
+  host: "localhost"
+  port: 6333
+  collection_name: "conventions"
+  vector_size: 384  # all-MiniLM-L6-v2 embedding size
+  distance_metric: "cosine"
+
+# GitHub API Configuration
+github:
+  api_base_url: "https://api.github.com"
+  rate_limit_per_hour: 5000
+  timeout_seconds: 30
+  # token: set via environment variable GITHUB_TOKEN
+
+# Review Generation Configuration
+review:
+  max_comments_per_file: 10
+  min_similarity_threshold: 0.7
+  hwahae_style_enabled: true
+  include_suggestions: true
+  consolidate_violations: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_path: "./logs/ai_pr_reviewer.log"
+  max_file_size: 10485760  # 10MB
+  backup_count: 5
+
+# Debug Mode
+debug: false
