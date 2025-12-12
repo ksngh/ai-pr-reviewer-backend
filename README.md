@@ -1,6 +1,68 @@
-# AI PR Reviewer - Backend
+# AI PR Reviewer Backend
 
-Python 기반 AI PR 리뷰 시스템의 백엔드 구현체입니다.
+Backend service for the AI PR Reviewer system that analyzes GitHub Pull Requests against team-defined coding conventions and generates structured, actionable feedback in Korean following Hwahae's collaborative review culture.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.9+
+- Docker (for Qdrant vector database)
+- GitHub Personal Access Token
+
+### Installation
+
+1. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+2. **Start Qdrant vector database:**
+```bash
+docker run -p 6333:6333 qdrant/qdrant
+```
+
+3. **Set up environment:**
+```bash
+cp .env.example .env
+# Edit .env with your GitHub token and configuration
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
+```
+
+### Basic Usage
+
+```python
+import asyncio
+from ai_pr_reviewer.api import AIReviewerAPI, ReviewRequest
+
+async def main():
+    # Initialize API
+    api = AIReviewerAPI()
+    
+    # Create review request
+    request = ReviewRequest(
+        repository="owner/repo",
+        pr_number=123,
+        github_token="your_github_token"
+    )
+    
+    # Generate review
+    result = await api.generate_review(request)
+    
+    # Print results
+    for comment in result.github_comments:
+        print(f"📝 {comment.file_path}: {comment.body}")
+
+asyncio.run(main())
+```
+
+## 🎯 Features
+
+- **Convention-Based Reviews**: Only provides feedback based on documented team conventions
+- **Vector-Powered Matching**: Uses semantic similarity to match code changes with relevant rules
+- **Hwahae Style**: Generates reviews in Korean with collaborative, constructive tone
+- **GitHub Integration**: Seamlessly integrates with GitHub PR workflow and Wiki pages
+- **Open Source Stack**: Built entirely on open-source models and tools
 
 ## 구조
 

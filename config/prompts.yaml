@@ -1,111 +1,310 @@
-# Prompt Templates for LLM Review Generation
+# Prompt Templates Configuration
 
-hwahae_review_prompt: |
-  당신은 화해(Hwahae) 팀의 시니어 개발자로서 코드 리뷰를 진행합니다.
-  팀의 협력적이고 건설적인 리뷰 문화를 반영하여 피드백을 제공해주세요.
+# System prompts for different languages
+system_prompts:
+  korean: |
+    당신은 화해 팀의 코드 리뷰어입니다. 팀에서 정의한 컨벤션 규칙을 기반으로 건설적이고 협력적인 코드 리뷰를 제공합니다.
 
-  ## 리뷰 원칙
-  1. 문서화된 컨벤션 규칙만을 근거로 피드백 제공
-  2. 구체적인 개선 방안과 예시 코드 포함
-  3. 협력적이고 존중하는 톤 유지
-  4. 학습 기회를 제공하는 설명 포함
+    리뷰 원칙:
+    1. 팀 컨벤션에 명시된 규칙만을 기준으로 피드백 제공
+    2. 협력적이고 존중하는 톤 유지
+    3. 구체적인 개선 방안 제시
+    4. 긍정적인 측면도 함께 언급
+    5. 학습과 성장을 돕는 방향으로 소통
 
-  ## 컨벤션 규칙
-  {convention_rules}
+    응답 형식:
+    - 컨벤션 위반이나 개선점이 있을 때만 코멘트 작성
+    - 각 코멘트는 관련 컨벤션 규칙을 명시
+    - 구체적인 수정 제안 포함
+    - 한국어로 작성
 
-  ## 코드 변경사항
-  파일: {file_path}
-  라인: {line_range}
+  english: |
+    You are a code reviewer for the Hwahae team. Provide constructive and collaborative code reviews based on team-defined convention rules.
 
-  ```{language}
-  {code_diff}
-  ```
+    Review principles:
+    1. Provide feedback based only on explicitly defined team conventions
+    2. Maintain a collaborative and respectful tone
+    3. Offer specific improvement suggestions
+    4. Mention positive aspects as well
+    5. Communicate in a way that helps learning and growth
 
-  ## 리뷰 요청
-  위 코드 변경사항을 컨벤션 규칙과 비교하여 리뷰해주세요.
-  위반사항이 있다면 구체적인 개선 방안을 제시해주세요.
-  컨벤션을 잘 따르고 있다면 별도 코멘트는 불필요합니다.
+    Response format:
+    - Write comments only when there are convention violations or improvements needed
+    - Each comment must reference the relevant convention rule
+    - Include specific modification suggestions
+    - Write in English
 
-  리뷰 형식:
-  **[위반 유형]**: 간단한 제목
-  - **문제점**: 구체적인 위반 내용
-  - **근거**: 관련 컨벤션 규칙 인용
-  - **개선안**: 수정 방법과 예시 코드
-  - **참고**: 추가 설명이나 학습 자료 (선택사항)
+# Review templates
+review_templates:
+  korean:
+    single_file: |
+      ## 코드 리뷰: {file_path}
 
-convention_format_template: |
-  규칙 ID: {rule_id}
-  제목: {title}
-  유형: {rule_type}
-  설명: {description}
-  올바른 예시: {examples}
-  잘못된 예시: {counter_examples}
-  ---
+      ### 변경 사항 분석
+      {change_summary}
 
-grounding_instructions: |
-  중요: 반드시 제공된 컨벤션 규칙만을 근거로 리뷰하세요.
-  - 규칙에 명시되지 않은 스타일 지적 금지
-  - 보안, 성능, 빌드 관련 판단 금지  
-  - 추측이나 일반적인 베스트 프랙티스 언급 금지
-  - 컨벤션 위반이 없으면 "리뷰 코멘트 없음" 응답
-
-no_violations_response: |
-  리뷰 코멘트 없음 - 코드가 팀 컨벤션을 잘 따르고 있습니다.
-
-# Example review templates for different violation types
-violation_templates:
-  naming_convention: |
-    **[네이밍 컨벤션]**: {title}
-    
-    - **문제점**: {problem_description}
-    - **근거**: 팀 컨벤션 규칙 `{rule_id}`에 따르면 {rule_description}
-    - **개선안**: 
+      ### 코드 스니펫
       ```{language}
-      # Before
-      {before_code}
-      
-      # After  
-      {after_code}
+      {code_snippet}
       ```
-    - **참고**: {additional_info}
 
-  documentation: |
-    **[문서화]**: {title}
-    
-    - **문제점**: {problem_description}
-    - **근거**: 팀 컨벤션 규칙 `{rule_id}`에 따르면 {rule_description}
-    - **개선안**:
+      ### 적용 가능한 컨벤션 규칙
+      {conventions}
+
+      ### 리뷰 요청
+      위 컨벤션 규칙을 기반으로 코드 변경사항을 검토하고, 필요한 경우에만 개선 제안을 해주세요. 
+      컨벤션을 잘 따르고 있다면 별도 코멘트 없이 "LGTM"으로 응답해주세요.
+
+    batch_files: |
+      ## 배치 코드 리뷰
+
+      다음 {file_count}개 파일에 대해 개별적으로 리뷰를 진행해주세요:
+
+      {file_sections}
+
+      ### 배치 리뷰 지침
+      - 각 파일에 대해 개별적으로 검토
+      - 컨벤션을 잘 따르는 파일은 "LGTM"으로 응답
+      - 개선이 필요한 부분만 구체적으로 코멘트
+      - 파일별로 구분하여 응답
+
+  english:
+    single_file: |
+      ## Code Review: {file_path}
+
+      ### Change Analysis
+      {change_summary}
+
+      ### Code Snippet
       ```{language}
-      {suggested_code}
+      {code_snippet}
       ```
-    - **참고**: {additional_info}
 
-  structure: |
-    **[코드 구조]**: {title}
-    
-    - **문제점**: {problem_description}
-    - **근거**: 팀 컨벤션 규칙 `{rule_id}`에 따르면 {rule_description}
-    - **개선안**: {suggestion}
-    - **참고**: {additional_info}
+      ### Applicable Convention Rules
+      {conventions}
 
-# Language-specific settings
-language_settings:
-  python:
-    comment_style: "#"
-    block_comment_start: '"""'
-    block_comment_end: '"""'
+      ### Review Request
+      Please review the code changes based on the above convention rules and provide improvement suggestions only when necessary.
+      If the code follows conventions well, please respond with "LGTM" only.
+
+    batch_files: |
+      ## Batch Code Review
+
+      Please review the following {file_count} files individually:
+
+      {file_sections}
+
+      ### Batch Review Guidelines
+      - Review each file individually
+      - Respond with "LGTM" for files that follow conventions well
+      - Provide specific comments only for parts that need improvement
+      - Separate responses by file
+
+# Convention formatting templates
+convention_formats:
+  korean:
+    rule_header: "**{rule_type} 규칙: {title}**"
+    rule_body: |
+      - 설명: {description}
+      - 카테고리: {category}
+      - 신뢰도: {confidence:.1%}
     
-  javascript:
-    comment_style: "//"
-    block_comment_start: "/*"
-    block_comment_end: "*/"
+    example_section: |
+      - 예시:
+      ```{language}
+      {example}
+      ```
     
-  typescript:
-    comment_style: "//"
-    block_comment_start: "/*"
-    block_comment_end: "*/"
+    counter_example_section: |
+      - 피해야 할 예시:
+      ```{language}
+      {counter_example}
+      ```
+
+  english:
+    rule_header: "**{rule_type} Rule: {title}**"
+    rule_body: |
+      - Description: {description}
+      - Category: {category}
+      - Confidence: {confidence:.1%}
     
-  java:
-    comment_style: "//"
-    block_comment_start: "/*"
-    block_comment_end: "*/"
+    example_section: |
+      - Example:
+      ```{language}
+      {example}
+      ```
+    
+    counter_example_section: |
+      - Counter-example:
+      ```{language}
+      {counter_example}
+      ```
+
+# Comment formatting templates
+comment_formats:
+  korean:
+    violation: |
+      ### 🚨 컨벤션 위반: {title}
+
+      {description}
+
+      **관련 컨벤션:** {convention_title} ({convention_category})
+
+      **제안사항:**
+      {suggestion}
+
+      **코드 위치:** `{file_path}:{line_range}`
+
+    suggestion: |
+      ### 💡 개선 제안: {title}
+
+      {description}
+
+      **관련 컨벤션:** {convention_title} ({convention_category})
+
+      **제안사항:**
+      {suggestion}
+
+      **코드 위치:** `{file_path}:{line_range}`
+
+    question: |
+      ### ❓ 확인 요청: {title}
+
+      {description}
+
+      **관련 컨벤션:** {convention_title} ({convention_category})
+
+      **코드 위치:** `{file_path}:{line_range}`
+
+  english:
+    violation: |
+      ### 🚨 Convention Violation: {title}
+
+      {description}
+
+      **Related Convention:** {convention_title} ({convention_category})
+
+      **Suggestion:**
+      {suggestion}
+
+      **Code Location:** `{file_path}:{line_range}`
+
+    suggestion: |
+      ### 💡 Improvement Suggestion: {title}
+
+      {description}
+
+      **Related Convention:** {convention_title} ({convention_category})
+
+      **Suggestion:**
+      {suggestion}
+
+      **Code Location:** `{file_path}:{line_range}`
+
+    question: |
+      ### ❓ Question: {title}
+
+      {description}
+
+      **Related Convention:** {convention_title} ({convention_category})
+
+      **Code Location:** `{file_path}:{line_range}`
+
+# Hwahae tone guidelines
+tone_guidelines:
+  korean:
+    collaborative_phrases:
+      - "어떨까요?"
+      - "좋을 것 같습니다"
+      - "추천드립니다"
+      - "고려해보시면"
+      - "제안드립니다"
+    
+    avoid_phrases:
+      - "해야 합니다"
+      - "잘못되었습니다"
+      - "틀렸습니다"
+      - "문제가 있습니다"
+    
+    replacements:
+      "해야 합니다": "하면 좋을 것 같습니다"
+      "잘못되었습니다": "개선할 수 있을 것 같습니다"
+      "틀렸습니다": "다른 방법을 고려해보면 어떨까요"
+      "문제가 있습니다": "더 나은 방법이 있을 것 같습니다"
+      "수정하세요": "수정해보시면 어떨까요"
+      "변경하세요": "변경을 고려해보시면 좋을 것 같습니다"
+      "하지 마세요": "피하시는 것이 좋을 것 같습니다"
+
+  english:
+    collaborative_phrases:
+      - "might want to consider"
+      - "could be improved by"
+      - "suggest"
+      - "recommend"
+      - "perhaps"
+    
+    avoid_phrases:
+      - "you must"
+      - "this is wrong"
+      - "you should not"
+      - "this is incorrect"
+    
+    replacements:
+      "you must": "you might want to"
+      "this is wrong": "this could be improved"
+      "you should not": "consider avoiding"
+      "this is incorrect": "there might be a better approach"
+
+# Quality control settings
+quality_control:
+  min_scores:
+    convention_grounding: 0.5
+    relevance: 0.4
+    specificity: 0.3
+    tone: 0.6
+    overall: 0.6
+  
+  hallucination_patterns:
+    korean:
+      - "일반적으로.*좋습니다"
+      - "보통.*합니다"
+      - "대부분.*권장"
+      - "성능상.*좋습니다"
+      - "가독성.*향상"
+    
+    english:
+      - "generally.*good"
+      - "usually.*recommended"
+      - "for performance"
+      - "for readability"
+      - "best practice"
+  
+  required_grounding_patterns:
+    korean:
+      - "컨벤션.*규칙"
+      - "팀.*정의"
+      - "규칙.*따라"
+    
+    english:
+      - "convention.*rule"
+      - "team.*defined"
+      - "according.*rule"
+
+# Model configuration
+model_settings:
+  default_model: "microsoft/DialoGPT-medium"
+  
+  generation_config:
+    max_length: 512
+    temperature: 0.7
+    top_p: 0.9
+    do_sample: true
+    
+  fallback_models:
+    - "microsoft/DialoGPT-small"
+    - "gpt2"
+  
+  token_limits:
+    max_prompt_tokens: 3000
+    max_response_tokens: 500
+    context_window: 4000
